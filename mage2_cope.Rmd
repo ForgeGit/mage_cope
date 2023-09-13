@@ -1,0 +1,228 @@
+---
+title: "magection Workflow"
+output: html_document
+date: "2023-09-12"
+---
+
+## Settings 
+
+### -Libraries
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+source("./scripts/0_0_Libraries.R")
+```
+
+### -Utils
+
+```{r}
+source(file = "./scripts/0_1_DownloadUtils.R")
+```
+
+### -Auth Token request
+
+```{r}
+## Run once
+# token <- POST("https://www.warcraftlogs.com/oauth/token",
+#           config = list(),
+#           body = list(
+#             grant_type="client_credentials",
+#             client_id=Sys.getenv("client_id"),
+#             client_secret=Sys.getenv("client_secret")))
+# 
+# token <- content(token,"parsed")
+# 
+# Manually copy token to .env file and load locally
+```
+
+```{r}
+token <- Sys.getenv("TOKEN")
+
+url <- "https://classic.warcraftlogs.com/api/v2"
+
+WCL_API2_request <- function(request) {
+  
+  request <- jsonlite::toJSON(list(query=request),
+                              auto_unbox=TRUE,
+                              bigint_as_char=F)
+  
+  response <- POST(url,
+                   add_headers("Content-Type" = "application/json",
+                               "Authorization"= paste0("Bearer ",
+                                                       token)),
+                   body = request,
+                   content_type_json(),
+                   encode = "json")
+  
+  response_formated <- fromJSON(content(response,
+                                        as = "text",
+                                        encoding="UTF-8"),
+                                bigint_as_char=TRUE)
+  
+  return(response_formated)
+}
+
+```
+
+## Download data
+
+```{r}
+source(file = "./scripts/1_magection_download.R")
+```
+
+
+## Process data
+
+```{r}
+source(file = "./scripts/2_magection_processing.R")
+```
+
+
+```{r}
+scale_factor = 2.65
+
+# ` variable name `     |n      or | or
+#"forge-"    
+#e901 github
+#e900 discord
+font_add(family = "forgefooter", "forgefooter.ttf")
+font_import()
+showtext_auto(TRUE)
+```
+
+```{r}
+source(file = "./scripts/3_1_plot_setting.R")
+```
+
+```{r}
+df_master<- df_cope_mage_master
+df_interim <- df_cope_mage_buffs_interm
+
+class_wow <- "mage"
+class_wow_color <- "#3FC7EB"
+source("plots/plot1.R")
+source("plots/plot5.R")
+source("plots/plot7.R")
+```
+
+```{r}
+df_cope_buffs_3
+```
+
+
+
+#### -Canvas
+
+
+##### *Title 
+
+```{r} 
+###
+title <- ggplot() +
+  vivax_theme_title() + 
+  labs(title="<p> Trial of the Crusader (ToC) 25-man Raid<br>Stats for <b><span style='color:#3FC7EB;'>Mage</span></b> rankings - <b><span style='color:#E5CC80;'>Top 100</span></b> and <b><span style='color:#E268A8;'>Top 300</span></b></p>",
+       subtitle="<p>  </p>") +                                                   # Remove grid, color & borders
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_markdown(face = "bold",
+                                      size = scale_factor * 18,
+                                      hjust = 0, 
+                                      margin = margin(b = -1)))
+
+ggsave("./_img/transition/plot_title.png",title, 
+       width = 10, height =4,units="in",device = "png",dpi=300)
+
+plot_title  <- magick::image_read("./_img/transition/plot_title.png")
+```
+
+##### *Subtitle 
+
+```{r} 
+title <- ggplot()  +
+  vivax_theme_title() + 
+  labs(title="",
+       subtitle="<p>Data from publicly uploaded logs to Warcraft Logs Classic from Aug 29 2023 21:00 to Sep 01 2023 21:00<br> <b><span style='color:#464646;'>Lower Spire</span>, <span style='color:#397000;'>Plague</span>, <span style='color:#6D0027;'>Blood</span></b> and <b><span style='color:#040A54;'>Frost</span></b> wing bosses + <b>The Frozen Throne (Lich King)</b></p>") +                                                   # Remove grid, color & borders
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank())
+
+ggsave("./_img/transition/plot_subtitle.png",title, 
+       width = 12, height =4,units="in",device = "png",dpi=300)
+
+plot_title_2  <- magick::image_read("./_img/transition/plot_subtitle.png")
+```
+
+
+##### *Blank
+```{r} 
+###
+title <- ggplot()  +
+  vivax_theme_title() + 
+  labs(title="",
+       subtitle="") +                                                   # Remove grid, color & borders
+  theme(axis.line = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank())
+
+
+
+ggsave("./_img/transition/plot_title_white.png",title, 
+       width = 12, height =4,units="in",device = "png",dpi=300)
+
+
+
+plot_title_white  <- magick::image_read("./_img/transition/plot_title_white.png")
+```
+
+
+##### *Final canvas 4
+
+```{r}
+plot_1 <- magick::image_read("./_img/plot_1_mage.png") # 1200
+plot_2 <- magick::image_read("./_img/plot_7_mage.png") # 900
+plot_3 <- magick::image_read("./_img/plot_5_mage.png") # 1200
+
+
+canvas <- image_blank(width = 2520, height = 2250)
+
+
+canvas <- image_composite(canvas, plot_title_white, offset = "+0+0",operator = "over")
+canvas <- image_composite(canvas, plot_title, offset = "+75+10",operator = "over")
+#canvas <- image_composite(canvas, plot_title_2, offset = "+1150+0",operator = "over")
+
+canvas <- image_composite(canvas,plot_1 , offset = "+0+160",operator = "over")
+canvas <- image_composite(canvas,  plot_2, offset = "+990+160",operator = "over")
+canvas <- image_composite(canvas, plot_3 , offset = "+1620+160",operator = "over")
+
+image_write(canvas,paste0("./_img/mage_Cope_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".png"))
+```
+
+
+```{r}
+df_cope_mage_buffs_3_download <- df_cope_mage_buffs_3_download %>%
+
+  group_by(logID,fightID,sourceID,boss,rank_boss) %>%
+  summarize(
+    across(where(is.double),sum)
+  ) %>%
+  ungroup() %>%
+
+  mutate(Tailor = `Haste Tail.`+ `Mana Tail.` + `Crit Tail.`) %>%
+
+  mutate(Tailor = ifelse(Tailor>=1|Tailor_2>=1,1,0))%>%
+
+
+  select(-c(`Haste Tail.`, `Mana Tail.`, `Crit Tail.`,FM_2,Tailor_2,Crit_Enchant2,Crit2,dummy)) %>%
+  left_join(df_cope_mage_master,
+            by=c("logID","fightID","sourceID"))
+
+write.csv(df_cope_mage_buffs_3_download,paste0("./raw_data/clean_df_mage_cope_data_",format(Sys.time(), "%Y_%m_%d_h%H_m%M"),".csv"))
+```
+
