@@ -120,7 +120,7 @@ df_cope_buffs_3
 ###
 title <- ggplot() +
   vivax_theme_title() + 
-  labs(title="<p> Trial of the Crusader (ToC) 25-man Raid<br>Stats for <b><span style='color:#3FC7EB;'>Mage</span></b> rankings - <b><span style='color:#E5CC80;'>Top 100</span></b> and <b><span style='color:#E268A8;'>Top 300</span></b></p>",
+  labs(title="<p> Trial of the Crusader (ToC) 25-man Raid<br>Stats for <b><span style='color:#3FC7EB;'>Mages</span></b> rankings - <b><span style='color:#E5CC80;'>Top 100</span></b> and <b><span style='color:#E268A8;'>Top 300</span></b></p>",
        subtitle="<p>  </p>") +                                                   # Remove grid, color & borders
   theme(axis.line = element_blank(),
         panel.grid.major = element_blank(),
@@ -206,7 +206,7 @@ image_write(canvas,paste0("./_img/mage_Cope_",format(Sys.time(), "%Y_%m_%d_h%H_m
 
 
 ```{r}
-df_cope_mage_buffs_3_download <- df_cope_mage_buffs_3_download %>%
+df_cope_mage_buffs_3_download <- df_cope_buffs_3_download %>%
 
   group_by(logID,fightID,sourceID,boss,rank_boss) %>%
   summarize(
