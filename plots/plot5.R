@@ -214,7 +214,7 @@ ungroup()%>%
                      limits = c(0,1.19),
                      breaks = seq(0,1,by=c(0.25)))  +
 
-  labs(x="Buff",y="% of magection Warlocks",
+  labs(x="Buff",y="% of Mages",
 
        caption=c("<p>Gift me a coffee: https:&#47;&#47;www&#46;ko-fi.com/forge<br>Last Update: 13/09/2023 &#40;dd/mm/yyyy&#41;</p>"),
 
